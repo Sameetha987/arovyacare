@@ -9,3 +9,17 @@ body {
   padding: 0;
   overflow-x: hidden;
 }
+@keyframes scaleIn {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.3s ease-out;
+}

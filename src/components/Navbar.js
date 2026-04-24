@@ -1,40 +1,58 @@
-import { Link, useLocation } from "react-router-dom";
 import { Shield } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const location = useLocation();
 
-  const navItem = (path, label) => (
-    <Link
-      to={path}
-      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-        location.pathname === path
-          ? "bg-pink-100 text-pink-600"
-          : "text-gray-600 hover:bg-gray-100"
-      }`}
-    >
-      {label}
-    </Link>
-  );
+  // 🔥 Dynamic page title
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case "/":
+        return "Register Mother";
+      case "/dashboard":
+        return "Dashboard";
+      case "/patients":
+        return "Mother List";
+      case "/result":
+        return "Risk Analysis";
+      default:
+        return "";
+    }
+  };
 
   return (
-    <div className="bg-white shadow-sm border-b px-6 py-3 flex items-center justify-between">
+    <div className="h-16 px-6 flex items-center justify-between bg-white border-b shadow-sm">
 
-      {/* LEFT */}
-      <div className="flex items-center gap-2">
-        <div className="bg-pink-100 p-2 rounded-full">
-          <Shield className="text-pink-500 w-5 h-5" />
+      {/* LEFT → Logo + Breadcrumb */}
+      <div className="flex items-center gap-3 text-sm">
+
+        {/* LOGO */}
+        <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-2 rounded-lg">
+          <Shield className="text-white w-4 h-4" />
         </div>
-        <span className="font-semibold text-gray-800">
+
+        {/* BRAND */}
+        <span className="font-semibold text-gray-800 text-base">
           ArovyaCare
+        </span>
+
+        {/* SEPARATOR */}
+        <span className="text-gray-300 text-lg">/</span>
+
+        {/* PAGE TITLE */}
+        <span className="text-gray-600 font-medium">
+          {getPageTitle()}
         </span>
       </div>
 
-      {/* RIGHT */}
-      <div className="flex items-center gap-2">
-        {navItem("/", "Add Patient")}
-        {navItem("/dashboard", "Dashboard")}
-      </div>
+      {/* RIGHT → CTA */}
+      <button
+        onClick={() => navigate("/")}
+        className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-pink-300 hover:scale-[1.03] transition"
+      >
+        + Add Mother
+      </button>
     </div>
   );
 }
