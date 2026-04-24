@@ -1,3 +1,4 @@
+
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Dashboard from "./Pages/Dashboard";
@@ -15,6 +16,16 @@ function App() {
         <Route path="/patient/:id" element={<PatientDetails />} />
       </Routes>
     </Router>
+
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
+
   );
 }
 
