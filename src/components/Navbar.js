@@ -47,15 +47,6 @@ export default function Navbar() {
         </span>
       </div>
 
-      {/* RIGHT → CTA */}
-      {location.pathname === "/dashboard" && (
-      <button
-        onClick={() => navigate("/")}
-        className="bg-gradient-to-r from-pink-500 to-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-md hover:shadow-pink-300 hover:scale-[1.03] transition"
-      >
-        + Add Mother
-      </button>
-      )}
     </div>
   );
 }

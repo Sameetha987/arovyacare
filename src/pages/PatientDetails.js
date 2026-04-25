@@ -102,7 +102,7 @@ export default function PatientDetails() {
       {/* 🔥 CHECKUPS BUTTON ONLY */}
       <div className="flex justify-end">
         <button
-          onClick={() => navigate(`/checkups/${id}`)} // teammate page
+          onClick={() => navigate(`/checkup/${id}`)} // teammate page
           className="bg-pink-500 text-white px-6 py-2 rounded-lg shadow hover:bg-pink-600 transition"
         >
           🩺 Checkups
