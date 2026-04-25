@@ -43,7 +43,8 @@ export default function MotherAssessment() {
   // 🔥 AI CALL
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (vitals.systolic && vitals.diastolic && vitals.sugar) {
+      if (vitals.systolic !== undefined && vitals.diastolic !== undefined && vitals.sugar !== undefined
+){
         callAI();
       }
     }, 500);
@@ -67,7 +68,7 @@ export default function MotherAssessment() {
     const data = await res.json();
 
     const cond = detectCondition();
-    setRisk(data.risk);
+    setRisk(data.risk || "Low");
     setCondition(cond);
     setExplanation(generateExplanation(data.risk, cond));
   };
@@ -134,16 +135,15 @@ export default function MotherAssessment() {
   };
 
   const saveAssessment = async () => {
-    await addDoc(collection(db, "assessments"), {
+   await addDoc(collection(db, "assessments"), {
       motherId: id,
       vitals,
       symptoms: answers,
       risk,
       condition,
       explanation,
-      createdAt: new Date(),
+      date: new Date(),   
     });
-
     alert("Saved 🚀");
   };
 

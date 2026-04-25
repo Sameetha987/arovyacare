@@ -17,7 +17,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRef} from "react"; // add useRef + useState if not already there
 import { Download } from "lucide-react"; // add Download icon
-
+import { useNavigate } from "react-router-dom";
 // ─────────────────────────────────────────────
 // HELPERS
 // ─────────────────────────────────────────────
@@ -343,7 +343,7 @@ function AISummary({ report, prevReport, alerts }) {
 // ─────────────────────────────────────────────
 export default function ReportPage() {
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [report, setReport]         = useState(null);
   const [mother, setMother]         = useState(null);
   const [allReports, setAllReports] = useState([]);
@@ -536,6 +536,17 @@ export default function ReportPage() {
         {/* H — AI SUMMARY */}
         <AISummary report={report} prevReport={prevReport} alerts={alerts} />
 
+          {/* 🚨 EMERGENCY MAP BUTTON */}
+          {report?.risk === "High" && (
+            <div className="flex justify-center mt-3">
+              <button
+                onClick={() => navigate("/emergency-map")}
+                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow hover:scale-105 transition font-semibold"
+              >
+                🚨 Find Nearby Hospitals
+              </button>
+            </div>
+          )}
         {/* F — VITAL CARDS */}
         <section>
           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Current Vitals</h2>

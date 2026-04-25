@@ -16,10 +16,12 @@ export default function PatientDetails() {
 
   const [patient, setPatient] = useState(null);
   const [reports, setReports] = useState([]);
+  const [latestReports, setLatestReports] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // 🔹 FETCH PATIENT
         const docRef = doc(db, "mothers", id);
         const docSnap = await getDoc(docRef);
 
@@ -27,8 +29,9 @@ export default function PatientDetails() {
           setPatient(docSnap.data());
         }
 
+        // 🔹 FETCH CHECKUPS (FIXED COLLECTION)
         const q = query(
-          collection(db, "reports"),
+          collection(db, "assessments"),
           where("motherId", "==", id)
         );
 
@@ -39,9 +42,14 @@ export default function PatientDetails() {
           ...d.data(),
         }));
 
+        // 🔹 SORT LATEST FIRST
         data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         setReports(data);
+
+        // 🔹 TAKE LATEST 5
+        setLatestReports(data.slice(0, 5));
+
       } catch (err) {
         console.error(err);
       }
@@ -52,12 +60,17 @@ export default function PatientDetails() {
 
   if (!patient) return <p className="p-6">Loading...</p>;
 
+  const currentRisk =
+  reports.length === 0
+    ? "Low"
+    : latestReports[0]?.risk || "Low";
+
   const riskColor =
-    patient.risk === "High"
-      ? "text-red-500"
-      : patient.risk === "Medium"
-      ? "text-yellow-500"
-      : "text-green-500";
+  currentRisk === "High"
+    ? "text-red-500"
+    : currentRisk === "Medium"
+    ? "text-yellow-500"
+    : "text-green-500";
 
   return (
     <div className="p-6 space-y-6 bg-gradient-to-br from-pink-50 to-blue-50 min-h-screen">
@@ -82,47 +95,102 @@ export default function PatientDetails() {
         <div className="text-right">
           <p className="text-sm opacity-80">Risk Level</p>
           <p className={`text-xl font-bold ${riskColor}`}>
-            {patient.risk || "Low"}
+            {currentRisk || "Low"}
           </p>
         </div>
 
       </div>
 
-      {/* 🔥 FULL DETAILS CARD */}
+      {/* 🔥 DETAILS */}
       <div className="bg-white p-6 rounded-xl shadow grid grid-cols-2 md:grid-cols-3 gap-4">
-
         <Info label="Pregnancy Weeks" value={patient.weeks} />
         <Info label="Weight (kg)" value={patient.weight} />
         <Info label="Height (cm)" value={patient.height} />
         <Info label="Address" value={patient.address} />
         <Info label="Phone" value={patient.phone} />
-
       </div>
 
-      {/* 🔥 CHECKUPS BUTTON ONLY */}
+      {/* 🔥 CHECKUP BUTTON */}
       <div className="flex justify-end">
         <button
-          onClick={() => navigate(`/checkup/${id}`)} // teammate page
+          onClick={() => navigate(`/checkup/${id}`)}
           className="bg-pink-500 text-white px-6 py-2 rounded-lg shadow hover:bg-pink-600 transition"
         >
           🩺 Checkups
         </button>
       </div>
 
-      {/* 🔥 SUMMARY */}
-      <div className="bg-white p-5 rounded-xl shadow">
-        <h2 className="font-semibold mb-3">Health Summary</h2>
+      {/* 🔥 HEALTH SUMMARY */}
+      <div className="bg-white p-6 rounded-2xl shadow">
+        <h2 className="font-semibold mb-4 text-lg">Health Summary</h2>
 
-        <p>Total Reports: {reports.length}</p>
-        <p>
-          Last Update:{" "}
-          {reports[0]?.date
-            ? new Date(reports[0].date).toLocaleDateString()
-            : "-"}
-        </p>
-        <p className={riskColor}>
-          Current Risk: {patient.risk || "Low"}
-        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+          <div className="p-4 bg-pink-50 rounded-xl">
+            <p className="text-sm text-gray-500">Total Checkups</p>
+            <p className="text-xl font-bold">{reports.length}</p>
+          </div>
+
+          <div className="p-4 bg-blue-50 rounded-xl">
+            <p className="text-sm text-gray-500">Last Checkup</p>
+            <p className="text-lg font-semibold">
+              {latestReports[0]?.date
+                ? new Date(latestReports[0].date).toLocaleDateString()
+                : "No data"}
+            </p>
+          </div>
+
+          <div className="p-4 bg-gray-50 rounded-xl">
+            <p className="text-sm text-gray-500">Current Status</p>
+            <p className={`text-lg font-bold ${riskColor}`}>
+              {currentRisk || "Low"}
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 🔥 RECENT CHECKUPS */}
+      <div className="bg-white p-6 rounded-2xl shadow">
+        <h2 className="font-semibold mb-4 text-lg">Recent Checkups</h2>
+
+        {latestReports.length === 0 ? (
+          <p className="text-gray-400">No checkups available</p>
+        ) : (
+          <div className="space-y-3">
+            {latestReports.map((r, index) => (
+              <div
+                key={r.id}
+                className="flex justify-between items-center p-3 rounded-lg border hover:shadow-sm transition"
+              >
+
+                <div>
+                  <p className="font-medium">
+                   Week {index + 1}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {r.date
+                      ? new Date(r.date).toLocaleDateString()
+                      : "No date"}
+                  </p>
+                </div>
+
+                <span
+                  className={`px-3 py-1 text-xs rounded-full font-semibold ${
+                    r.risk === "High"
+                      ? "bg-red-100 text-red-600"
+                      : r.risk === "Medium"
+                      ? "bg-yellow-100 text-yellow-600"
+                      : "bg-green-100 text-green-600"
+                  }`}
+                >
+                  {r.risk || "Low"}
+                </span>
+
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
     </div>
