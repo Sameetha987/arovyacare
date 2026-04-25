@@ -61,7 +61,7 @@ const sortedPatients = [...filteredPatients].sort((a, b) => {
 
       {/* TITLE */}
       <h1 className="text-2xl font-bold mb-6">
-        All Patients
+        All Mothers
       </h1>
 
 

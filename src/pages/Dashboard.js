@@ -52,7 +52,7 @@ const COLORS = ["#ef4444", "#f59e0b", "#22c55e"];
 
     {/* STATS */}
     <div className="grid grid-cols-4 gap-6">
-    <Card title="Total Patients" value={total} color="blue" icon={<Users />} />
+    <Card title="Women Under Care" value={total} color="blue" icon={<Users />} />
     <Card title="High Risk" value={high} color="red" icon={<AlertTriangle />} />
     <Card title="Medium Risk" value={medium} color="yellow" icon={<Activity />} />
     <Card title="Low Risk" value={low} color="green" icon={<Shield />} />
@@ -127,8 +127,8 @@ const COLORS = ["#ef4444", "#f59e0b", "#22c55e"];
 <div className="bg-white p-4 rounded-xl shadow">
   <p className="text-sm text-gray-600">
     💡 Insight: {high > 0 
-      ? `${high} patients need immediate attention` 
-      : "All patients are stable"}
+      ? `${high} mothers need immediate attention` 
+      : "All Mothers are stable"}
   </p>
 </div>
 
