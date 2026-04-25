@@ -15,6 +15,16 @@ import {
 import { db } from "../firebase";
 import { collection, addDoc } from "firebase/firestore";
 
+function calculateRisk(form) {
+  const age = Number(form.age);
+  const weeks = Number(form.weeks);
+  const weight = Number(form.weight);
+
+  if (age > 35 || weight < 45 || weeks < 12) return "High";
+  if (age > 30) return "Medium";
+  return "Low";
+}
+
 export default function AddMother() {
   const navigate = useNavigate();
 
@@ -44,11 +54,12 @@ export default function AddMother() {
     try {
       setLoading(true);
 
-      await addDoc(collection(db, "mothers"), {
-        ...form,
-        phone: "+91" + form.phone,
-        createdAt: new Date(),
-      });
+     await addDoc(collection(db, "mothers"), {
+  ...form,
+  phone: "+91" + form.phone,
+  risk: calculateRisk(form),   // 🔥 ADD THIS
+  createdAt: new Date(),
+});
 
       setShowModal(true);
     } catch (err) {

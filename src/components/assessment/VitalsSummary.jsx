@@ -1,18 +1,23 @@
-// VitalsSummary.jsx
 export default function VitalsSummary({ vitals }) {
-  const data = [
-    { label: "BP", value: `${vitals.systolic}/${vitals.diastolic}` },
+  const items = [
+    { label: "Systolic BP", value: vitals.systolic },
+    { label: "Diastolic BP", value: vitals.diastolic },
     { label: "Sugar", value: vitals.sugar },
-    { label: "Temp", value: vitals.temp },
-    { label: "HR", value: vitals.heartrate },
+    { label: "Temperature", value: vitals.temp },
+    { label: "Heart Rate", value: vitals.heartrate },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {data.map((d, i) => (
-        <div key={i} className="bg-white p-4 rounded-2xl shadow">
-          <p className="text-xs text-gray-500">{d.label}</p>
-          <p className="text-lg font-semibold">{d.value}</p>
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      {items.map((item, i) => (
+        <div
+          key={i}
+          className="bg-white p-4 rounded-2xl shadow text-center"
+        >
+          <p className="text-sm text-gray-500">{item.label}</p>
+          <p className="text-xl font-semibold text-gray-700">
+            {item.value}
+          </p>
         </div>
       ))}
     </div>

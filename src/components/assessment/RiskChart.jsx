@@ -1,4 +1,3 @@
-// RiskChart.jsx
 import {
   LineChart,
   Line,
@@ -8,24 +7,26 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export default function RiskChart() {
+export default function RiskChart({ vitals }) {
   const data = [
-    { week: "W1", risk: 20 },
-    { week: "W2", risk: 40 },
-    { week: "W3", risk: 60 },
-    { week: "W4", risk: 80 },
+    { name: "Systolic", value: vitals.systolic },
+    { name: "Diastolic", value: vitals.diastolic },
+    { name: "Sugar", value: vitals.sugar },
+    { name: "Heart", value: vitals.heartrate },
   ];
 
   return (
-    <div className="bg-white p-4 rounded-2xl shadow h-64">
-      <p className="text-sm mb-2 text-gray-600">Risk Trend</p>
+    <div className="bg-white p-6 rounded-3xl shadow">
+      <h3 className="font-semibold mb-4 text-gray-700">
+        Vitals Overview
+      </h3>
 
-      <ResponsiveContainer width="100%" height="100%">
+      <ResponsiveContainer width="100%" height={250}>
         <LineChart data={data}>
-          <XAxis dataKey="week" />
+          <XAxis dataKey="name" />
           <YAxis />
           <Tooltip />
-          <Line type="monotone" dataKey="risk" stroke="#ec4899" />
+          <Line type="monotone" dataKey="value" strokeWidth={3} />
         </LineChart>
       </ResponsiveContainer>
     </div>

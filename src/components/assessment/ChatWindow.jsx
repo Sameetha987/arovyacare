@@ -76,26 +76,49 @@ export default function ChatWindow({ initialVitals, mother }) {
   }, [initialVitals, mother]);
 
   const callMLModel = async (vitals) => {
-    try {
-      const res = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          age: mother.age,
-          systolic: vitals.systolic,
-          diastolic: vitals.diastolic,
-          sugar: vitals.sugar,
-          temp: vitals.temp || 98,
-          heartrate: vitals.heartrate || 75,
-        }),
-      });
-      const data = await res.json();
-      return data.risk;
-    } catch (err) {
-      console.error("ML API error:", err);
-      return "Low";
+  try {
+    const controller = new AbortController();
+
+    // ⏱️ timeout (3 sec)
+    const timeout = setTimeout(() => {
+      controller.abort();
+    }, 3000);
+
+    const res = await fetch("http://127.0.0.1:5000/predict", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      signal: controller.signal,
+      body: JSON.stringify({
+        age: Number(mother?.age) || 25,
+        systolic: Number(vitals.systolic),
+        diastolic: Number(vitals.diastolic),
+        sugar: Number(vitals.sugar),
+        temp: Number(vitals.temp) || 98,
+        heartrate: Number(vitals.heartrate) || 75,
+      }),
+    });
+
+    clearTimeout(timeout);
+
+    // ❗ check response
+    if (!res.ok) {
+      throw new Error("Server error");
     }
-  };
+
+    const data = await res.json();
+
+    console.log("🤖 ML Response:", data);
+
+    return data.risk || "Low"; // fallback safety
+  } catch (err) {
+    console.error("❌ ML API error:", err.message);
+
+    // 🔥 fallback logic (VERY IMPORTANT)
+    return "Low";
+  }
+};
 
   const handleAnswer = async (val) => {
     if (!currentQ) return;
@@ -130,7 +153,14 @@ export default function ChatWindow({ initialVitals, mother }) {
       await pushDoctorMessage("Finalizing assessment...", 900);
 
       const ruleRisk = calculateRisk(initialVitals, newAnswers);
-      const mlRisk = await callMLModel(initialVitals);
+      const normalizeRisk = (raw) => {
+  const r = (raw || "").toLowerCase();
+  if (r.includes("high"))   return "High";
+  if (r.includes("medium")) return "Medium";
+  return "Low";
+};
+
+const mlRisk = normalizeRisk(await callMLModel(initialVitals));
 
       let finalRisk = mlRisk;
       if (ruleRisk === "High") finalRisk = "High";
@@ -140,7 +170,7 @@ export default function ChatWindow({ initialVitals, mother }) {
       await pushDoctorMessage(finalMsg, 1000);
 
       const docId = await saveAssessment(finalRisk, newAnswers);
-
+      console.log("Saved Report ID:", docId);
       setFinalRisk(finalRisk);
 setFinished(true);
 
@@ -230,15 +260,6 @@ setTimeout(() => {
           {!finished && currentQ && (
             <div className="border-t bg-white/80 px-6 py-4 flex-shrink-0">
               <InputControls type="yesno" onSubmit={handleAnswer} />
-            </div>
-          )}
-
-          {/* RESULT */}
-          {finished && (
-            <div className="border-t px-6 py-4 flex justify-center flex-shrink-0">
-              <button className="px-5 py-2 bg-green-500 text-white rounded-xl">
-                View Full Report →
-              </button>
             </div>
           )}
         </div>

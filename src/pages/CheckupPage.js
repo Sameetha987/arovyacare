@@ -19,7 +19,10 @@ export default function CheckupPage() {
     const fetchMother = async () => {
       const snap = await getDoc(doc(db, "mothers", id));
       if (snap.exists()) {
-        setMother(snap.data());
+        setMother({
+  id: snap.id,      
+  ...snap.data(),
+});
       }
     };
     fetchMother();
