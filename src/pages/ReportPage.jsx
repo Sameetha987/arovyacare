@@ -47,23 +47,33 @@ import html2canvas from "html2canvas";
 const toNum = (v) => parseFloat(v) || 0;
 
 const riskConfig = {
-  High: {
-    bg: "from-red-500 to-rose-600",
+  High:    {
+    bg:    "from-red-500 to-rose-600",
     badge: "bg-red-100 text-red-700 border-red-300",
-    dot: "bg-red-500",
+    dot:   "bg-red-500",
     label: "High Risk",
+   
   },
-  Medium: {
-    bg: "from-amber-400 to-orange-500",
+  Medium:  {
+    bg:    "from-amber-400 to-orange-500",
     badge: "bg-amber-100 text-amber-700 border-amber-300",
-    dot: "bg-amber-500",
+    dot:   "bg-amber-500",
     label: "Medium Risk",
+ 
   },
-  Low: {
-    bg: "from-emerald-400 to-teal-500",
-    badge: "bg-emerald-100 text-emerald-700 border-emerald-300",
-    dot: "bg-emerald-500",
+  Low:     {
+    bg:    "from-blue-400 to-cyan-500",
+    badge: "bg-blue-100 text-blue-700 border-blue-300",
+    dot:   "bg-blue-400",
     label: "Low Risk",
+
+  },
+  Healthy: {
+    bg:    "from-emerald-400 to-teal-500",
+    badge: "bg-emerald-100 text-emerald-700 border-emerald-300",
+    dot:   "bg-emerald-500",
+    label: "Healthy",
+
   },
 };
 
@@ -454,32 +464,29 @@ function AISummary({ report, prevReport, alerts }) {
 
   let summary = "";
   if (risk === "High" && hasAlerts) {
-    summary =
-      "Patient condition is critical. Multiple vital signs are outside safe ranges and risk level is High. Immediate medical intervention is strongly recommended.";
+    summary = "Patient condition is critical. Multiple vital signs are outside safe ranges. Immediate medical intervention is strongly recommended.";
   } else if (risk === "High") {
-    summary =
-      "Patient is categorized as High Risk. Close monitoring and urgent follow-up with a qualified physician is advised.";
+    summary = "Patient is categorized as High Risk. Close monitoring and urgent follow-up with a qualified physician is advised immediately.";
   } else if (risk === "Medium" && worsening) {
-    summary =
-      "Patient condition has escalated from Low to Medium risk. Continued monitoring and preventive care are essential to avoid further deterioration.";
+    summary = "Patient condition has escalated to Medium Risk. Preventive care and a doctor visit within 24–48 hours is strongly advised.";
   } else if (risk === "Medium") {
-    summary =
-      "Patient is at moderate risk. Some vital indicators require attention. Regular check-ins and lifestyle modifications are recommended.";
+    summary = "Patient is at moderate risk. Some vital indicators require attention. Regular check-ins and lifestyle modifications are recommended.";
+  } else if (risk === "Low" && worsening) {
+    summary = "Patient shows mild concern with some indicators moving in the wrong direction. Continue monitoring and report changes to the doctor.";
+  } else if (risk === "Low") {
+    summary = "Patient shows mild concern but is generally stable. Routine prenatal monitoring and a follow-up appointment are advised.";
   } else if (improving) {
-    summary =
-      "Patient condition is improving. Risk has reduced from a higher level to Low. Continue current care plan and maintain regular check-ups.";
+    summary = "Patient condition is improving and now in the healthy range. Continue current care plan and scheduled prenatal check-ups.";
   } else {
-    summary =
-      "Patient condition is stable and within normal parameters. Continue routine monitoring and prenatal care as scheduled.";
+    summary = "Patient is in good health. All vitals are within normal ranges. Continue routine prenatal care as scheduled.";
   }
 
-  const icon = risk === "High" ? "🚨" : risk === "Medium" ? "⚠️" : "✅";
+  const icon = riskConfig[risk]?.icon || "✅";
   const bg =
-    risk === "High"
-      ? "from-red-50 to-rose-50 border-red-200"
-      : risk === "Medium"
-        ? "from-amber-50 to-orange-50 border-amber-200"
-        : "from-emerald-50 to-teal-50 border-emerald-200";
+    risk === "High"    ? "from-red-50 to-rose-50 border-red-200"       :
+    risk === "Medium"  ? "from-amber-50 to-orange-50 border-amber-200" :
+    risk === "Low"     ? "from-blue-50 to-cyan-50 border-blue-200"     :
+    "from-emerald-50 to-teal-50 border-emerald-200";
 
   return (
     <div className={`rounded-2xl border-2 bg-gradient-to-br p-6 ${bg}`}>

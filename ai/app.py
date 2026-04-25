@@ -64,36 +64,39 @@ def rule_based_risk(data):
     if f["crit_temp"]:            score += 5
     elif f["high_temp"] or f["low_temp"]: score += 2
 
-    if score >= 10: return "High",   score
-    if score >= 5:  return "Medium", score
-    return "Low", score
+    if score >= 14: return "High",    score
+    if score >= 7:  return "Medium",  score
+    if score >= 3:  return "Low",     score
+    return          "Healthy",        score
+
 
 def normalize_ml_output(raw_prediction):
-    """Normalize whatever the ML model returns to High/Medium/Low."""
     p = str(raw_prediction).lower().strip()
-    if "high" in p or p == "2":   return "High"
-    if "medium" in p or "mid" in p or p == "1": return "Medium"
-    return "Low"
+    if "high" in p or p == "3":   return "High"
+    if "medium" in p or "mid" in p or p == "2": return "Medium"
+    if "low" in p or p == "1":    return "Low"
+    return "Healthy"
+
 
 def combine_risks(rule_risk, ml_risk, rule_score):
-    level_map   = {"Low": 0, "Medium": 1, "High": 2}
-    level_words = ["Low", "Medium", "High"]
+    level_map   = {"Healthy": 0, "Low": 1, "Medium": 2, "High": 3}
+    level_words = ["Healthy", "Low", "Medium", "High"]
 
     rule_level = level_map.get(rule_risk, 0)
     ml_level   = level_map.get(ml_risk,   0)
 
-    # ✅ KEY FIX: If rule engine says Low with score 0-2
-    # (vitals essentially normal) → ML CANNOT override to Medium or High
-    if rule_score <= 2 and ml_level >= 1:
-        print(f"⚠️ Vitals normal (score={rule_score}), ignoring ML={ml_risk} → Low")
+    # Normal vitals → ML cannot push above Low
+    if rule_score <= 2 and ml_level >= 2:
+        print(f"⚠️  Vitals normal (score={rule_score}), ML={ml_risk} → Healthy")
+        return "Healthy"
+
+    # Mild score → ML cannot push to High
+    if rule_score <= 4 and ml_level >= 3:
+        print(f"⚠️  Mild score ({rule_score}), capping ML High → Low")
         return "Low"
 
-    # If vitals perfectly normal → ML can push to Medium at most
-    if rule_score == 0 and ml_level == 2:
-        return "Medium"
-
     # Rule says High → always High
-    if rule_level == 2:
+    if rule_level == 3:
         return "High"
 
     # They agree
@@ -104,9 +107,10 @@ def combine_risks(rule_risk, ml_risk, rule_score):
     if abs(rule_level - ml_level) == 1:
         return level_words[max(rule_level, ml_level)]
 
-    # Strongly disagree → rule wins, ML nudges +1 max
-    final = min(rule_level + 1, 2)
+    # Strongly disagree → rule wins, nudge +1
+    final = min(rule_level + 1, 3)
     return level_words[final]
+
 
 
 @app.route("/predict", methods=["POST"])

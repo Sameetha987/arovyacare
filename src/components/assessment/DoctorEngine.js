@@ -465,92 +465,61 @@ export function calculateRisk(vitals, answers) {
   const f = analyzeVitals(vitals);
   let score = 0;
 
-  // ── VITALS (unchanged)
-  if (f.critSugar) score += 6;
-  else if (f.highSugar || f.lowSugar) score += 3;
-  if (f.highBP && f.highDiasBP) score += 6;
-  else if (f.highBP || f.lowBP) score += 3;
-  if (f.critHR) score += 5;
-  else if (f.highHR || f.lowHR) score += 2;
-  if (f.critTemp) score += 5;
-  else if (f.highTemp || f.lowTemp) score += 2;
-  if (f.lowWeight) score += 2;
-  if (f.highWeight) score += 1;
+  // ── VITALS
+  if (f.critSugar)                      score += 6;
+  else if (f.highSugar || f.lowSugar)   score += 3;
 
-  // ── SYMPTOMS — only count if vitals support concern
-  const hasAbnormalVitals =
-    f.highBP ||
-    f.lowBP ||
-    f.highSugar ||
-    f.highHR ||
-    f.highTemp ||
-    f.critSugar ||
-    f.critHR ||
-    f.critTemp;
+  if (f.highBP && f.highDiasBP)         score += 6;
+  else if (f.highBP || f.lowBP)         score += 3;
 
-  // Critical symptoms — only meaningful if vitals back them up
-  if (answers.vaginal_bleeding) {
-    if (hasCriticalVitals) score += 6;
-    else if (hasMildAbnormal) score += 3;
-    else score += 2;
-  }
-  const hasCriticalVitals =
-    f.critSugar ||
-    f.critHR ||
-    f.critTemp ||
-    f.highBP ||
-    f.highSugar ||
-    f.highHR;
-  const hasMildAbnormal = f.lowBP || f.lowSugar || f.lowHR || f.highTemp;
+  if (f.critHR)                         score += 5;
+  else if (f.highHR || f.lowHR)         score += 2;
 
-  if (answers.fainting) {
-    if (hasCriticalVitals)
-      score += 5; // truly critical
-    else if (hasMildAbnormal)
-      score += 2; // mild concern — fainting with low BP
-    else score += 1; // no vitals backing it
-  }
-  if (answers.confusion) score += hasAbnormalVitals ? 5 : 1;
-  if (answers.chest_pain) {
-    if (hasCriticalVitals) score += 5;
-    else if (hasMildAbnormal) score += 2;
-    else score += 1;
-  }
-  if (answers.fetal_movement) {
-    if (hasCriticalVitals) score += 5;
-    else if (hasMildAbnormal) score += 2;
-    else score += 1;
-  }
+  if (f.critTemp)                       score += 5;
+  else if (f.highTemp || f.lowTemp)     score += 2;
 
-  // High concern
-  if (answers.vision) score += hasAbnormalVitals ? 4 : 1;
-  if (answers.swelling_face) score += hasAbnormalVitals ? 4 : 1;
-  if (answers.abdominal_pain) score += hasAbnormalVitals ? 3 : 1;
-  if (answers.breathlessness) score += hasAbnormalVitals ? 3 : 1;
-  if (answers.palpitations) score += hasAbnormalVitals ? 3 : 1;
+  if (f.lowWeight)                      score += 2;
+  if (f.highWeight)                     score += 1;
 
-  // Moderate
-  if (answers.headache) score += hasAbnormalVitals ? 2 : 0;
-  if (answers.swelling_legs) score += hasAbnormalVitals ? 2 : 1;
-  if (answers.dizziness) score += hasAbnormalVitals ? 2 : 1;
-  if (answers.chills) score += hasAbnormalVitals ? 2 : 1;
-  if (answers.body_pain) score += 1;
+  const hasAbnormalVitals = f.highBP || f.lowBP || f.highSugar ||
+                             f.highHR || f.highTemp || f.critSugar ||
+                             f.critHR || f.critTemp;
+  const hasCriticalVitals = f.critSugar || f.critHR || f.critTemp ||
+                             f.highBP || f.highSugar || f.highHR;
+  const hasMildAbnormal   = f.lowBP || f.lowSugar || f.lowHR || f.highTemp;
 
-  // ✅ Mild — these alone can NEVER push to High
-  if (answers.thirst) score += 1;
-  if (answers.urination) score += 1;
+  // ── SYMPTOMS
+  if (answers.vaginal_bleeding) score += hasCriticalVitals ? 6 : hasMildAbnormal ? 3 : 2;
+  if (answers.fainting)         score += hasCriticalVitals ? 5 : hasMildAbnormal ? 2 : 1;
+  if (answers.confusion)        score += hasCriticalVitals ? 5 : 1;
+  if (answers.chest_pain)       score += hasCriticalVitals ? 5 : hasMildAbnormal ? 2 : 1;
+  if (answers.fetal_movement)   score += hasCriticalVitals ? 5 : hasMildAbnormal ? 2 : 1;
+  if (answers.vision)           score += hasAbnormalVitals ? 4 : 1;
+  if (answers.swelling_face)    score += hasAbnormalVitals ? 4 : 1;
+  if (answers.abdominal_pain)   score += hasAbnormalVitals ? 3 : 1;
+  if (answers.breathlessness)   score += hasAbnormalVitals ? 3 : 1;
+  if (answers.palpitations)     score += hasAbnormalVitals ? 3 : 1;
+  if (answers.headache)         score += hasAbnormalVitals ? 2 : 0;
+  if (answers.swelling_legs)    score += hasAbnormalVitals ? 2 : 1;
+  if (answers.dizziness)        score += hasAbnormalVitals ? 2 : 1;
+  if (answers.chills)           score += hasAbnormalVitals ? 2 : 1;
+  if (answers.body_pain)        score += 1;
+  if (answers.thirst)           score += 1;
+  if (answers.urination)        score += 1;
   if (answers.fatigue || answers.fatigue_sugar) score += 1;
-  if (answers.nausea) score += 1; // ✅ nausea alone = 1 point max
-  if (answers.appetite) score += 1;
+  if (answers.nausea)           score += 1;
+  if (answers.appetite)         score += 1;
 
-  // Combination penalties — only if vitals are already concerning
-  if (f.highBP && answers.headache && answers.vision) score += 4;
-  if (f.highSugar && answers.thirst && answers.urination) score += 3;
+  // Combination penalties
+  if (f.highBP && answers.headache && answers.vision)           score += 4;
+  if (f.highSugar && answers.thirst && answers.urination)       score += 3;
   if (f.highHR && answers.chest_pain && answers.breathlessness) score += 4;
 
-  if (score >= 14) return { risk: "High", score };
-  if (score >= 7) return { risk: "Medium", score };
-  return { risk: "Low", score };
+  // ✅ 4-LEVEL SCORING
+  if (score >= 14) return { risk: "High",    score };
+  if (score >= 7)  return { risk: "Medium",  score };
+  if (score >= 3)  return { risk: "Low",     score }; // mild concern
+  return                  { risk: "Healthy", score }; // truly normal
 }
 
 // ===============================
@@ -559,20 +528,29 @@ export function calculateRisk(vitals, answers) {
 export function generateFinalMessage(risk) {
   if (risk === "High") {
     return {
-      text: `Based on the vitals and symptoms reported, there is significant concern that places this patient in the high-risk category.\n\nImmediate medical consultation is strongly advised. Please do not delay seeking professional care.`,
+      text: `Based on the vitals and symptoms reported, there is significant concern placing this patient in the high-risk category.\n\nImmediate medical consultation is strongly advised. Please do not delay seeking professional care.`,
       variant: "critical",
     };
   }
 
   if (risk === "Medium") {
     return {
-      text: `The assessment indicates moderate risk based on the combination of vitals and symptoms reported.\n\nI recommend scheduling a doctor's appointment within the next 24–48 hours for a thorough clinical evaluation.`,
+      text: `The assessment indicates moderate risk based on the combination of vitals and symptoms.\n\nI recommend scheduling a doctor's appointment within the next 24–48 hours for a thorough clinical evaluation.`,
       variant: "warning",
     };
   }
 
+  if (risk === "Low") {
+    return {
+      text: `The assessment shows mild concern. While vitals are near normal, some indicators need monitoring.\n\nContinue regular prenatal check-ups and report any worsening symptoms to your doctor promptly.`,
+      variant: "info",
+    };
+  }
+
+  // Healthy
   return {
-    text: `Based on the current vitals and symptoms, the patient's condition appears generally stable.\n\nContinue regular prenatal monitoring, maintain proper nutrition and hydration, and attend all scheduled check-ups.`,
+    text: `Everything looks great! Vitals are within healthy ranges and no significant symptoms were reported.\n\nKeep up with routine prenatal care, proper nutrition, hydration, and scheduled check-ups.`,
     variant: "safe",
   };
 }
+

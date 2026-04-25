@@ -18,39 +18,49 @@ import {
 // ─────────────────────────────────────────────
 // Risk level helpers
 // ─────────────────────────────────────────────
-const RISK_LEVEL = { Low: 0, Medium: 1, High: 2 };
-const LEVEL_RISK = ["Low", "Medium", "High"];
+const RISK_LEVEL = { Healthy: 0, Low: 1, Medium: 2, High: 3 };
+const LEVEL_RISK = ["Healthy", "Low", "Medium", "High"];
 
 const normalizeRisk = (raw) => {
   const r = (raw || "").toLowerCase().trim();
-  if (r.includes("high"))   return "High";
+  if (r.includes("high"))              return "High";
   if (r.includes("medium") || r.includes("mid")) return "Medium";
-  return "Low";
+  if (r.includes("low"))               return "Low";
+  return "Healthy";
 };
 
-// ─────────────────────────────────────────────
-// Smart combiner: ML + Rule engine
-// Rule engine has symptom context → it wins on conflicts
-// ML can nudge by max 1 level only
-// ─────────────────────────────────────────────
-// ✅ Replace the old combineRisks function with this
 const combineRisks = (ruleRisk, mlRisk, ruleScore = 0) => {
   const ruleLevel = RISK_LEVEL[ruleRisk] ?? 0;
   const mlLevel   = RISK_LEVEL[mlRisk]   ?? 0;
 
-  // Normal vitals + no symptoms → ML cannot override
-  if (ruleScore <= 2 && mlLevel >= 1) {
-    console.log(`⚠️ Vitals normal (score=${ruleScore}), ignoring ML=${mlRisk} → Low`);
+  // ✅ Truly normal vitals + no symptoms → always Healthy, ignore ML
+  if (ruleScore <= 2 && mlLevel >= 2) {
+    console.log(`⚠️ Vitals normal (score=${ruleScore}), ignoring ML=${mlRisk} → Healthy`);
+    return "Healthy";
+  }
+
+  // Mild score but ML says higher → cap at Low
+  if (ruleScore <= 4 && mlLevel >= 3) {
+    console.log(`⚠️ Mild score (${ruleScore}), capping ML High → Low`);
     return "Low";
   }
 
-  if (ruleLevel === 2) return "High";
-  if (ruleLevel === mlLevel) return LEVEL_RISK[ruleLevel];
-  if (Math.abs(ruleLevel - mlLevel) === 1) return LEVEL_RISK[Math.max(ruleLevel, mlLevel)];
+  // Rule says High → always High
+  if (ruleLevel === 3) return "High";
 
-  const final = Math.min(ruleLevel + 1, 2);
+  // They agree → use it
+  if (ruleLevel === mlLevel) return LEVEL_RISK[ruleLevel];
+
+  // Within 1 step → take higher
+  if (Math.abs(ruleLevel - mlLevel) === 1) {
+    return LEVEL_RISK[Math.max(ruleLevel, mlLevel)];
+  }
+
+  // Strongly disagree → rule wins, ML nudges +1 max
+  const final = Math.min(ruleLevel + 1, 3);
   return LEVEL_RISK[final];
 };
+
 export default function ChatWindow({ initialVitals, mother }) {
   const [conversation, setConversation] = useState([]);
   const [answers, setAnswers]           = useState({});
