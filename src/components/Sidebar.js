@@ -60,7 +60,7 @@ export default function Sidebar() {
         <div className="space-y-2">
           {item("/dashboard", "Dashboard", <LayoutDashboard className="w-5 h-5" />)}
           {item("/", "Add Mother", <UserPlus className="w-5 h-5" />)}
-          {item("/patients", "Mother List", <Users className="w-5 h-5" />)}
+          {item("/mother-list", "Mother List", <Users className="w-5 h-5" />)}
         </div>
       </div>
 
