@@ -29,7 +29,7 @@ export default function Navbar() {
       <div className="flex items-center gap-3 text-sm">
 
         {/* LOGO */}
-        <div className="bg-gradient-to-r from-pink-500 to-rose-500 p-2 rounded-lg">
+        <div className="bg-gradient-to-r from-pink-500 to-pink-400 p-2 rounded-lg">
           <Shield className="text-white w-4 h-4" />
         </div>
 
