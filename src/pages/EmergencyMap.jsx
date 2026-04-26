@@ -34,7 +34,7 @@ async function fetchNearby(lat, lng, radiusM = 6000) {
   nwr["amenity"="clinic"](around:${Math.round(radiusM * 0.7)},${lat},${lng});
 );
 out center 20;`;
-  const res = await fetch("https://overpass-api.de/api/interpreter", {
+  const res = await fetch("https://overpass.kumi.systems/api/interpreter", {
     method: "POST",
     body: "data=" + encodeURIComponent(q),
   });
