@@ -11,6 +11,7 @@ import Urgent from "../pages/Urgent";
 import PatientDetails from "../pages/PatientDetails";
 import MotherList from "../pages/MotherList";
 import AddReport from "../pages/AddReport";
+import EmergencyMap from "../pages/EmergencyMap";
 
 export default function AppRoutes() {
   return (
@@ -29,6 +30,7 @@ export default function AppRoutes() {
 
       {/* ✅ No-scroll pages */}
       <Route path="/checkup/:id" element={<Layout noScroll={true}><CheckupPage /></Layout>} />
+      <Route path="/emergency-map" element={<EmergencyMap />} />
 
     </Routes>
   );

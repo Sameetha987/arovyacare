@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
+import { ArrowLeft } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   doc,
   getDoc,
@@ -149,7 +151,6 @@ function generateMedicalPDF(mother, report, prevReport, allReports) {
       y = 20; // reset top margin
     }
   };
-  
 
   const ln = (x1, y1, x2, y2, c = [180, 180, 180]) => {
     pdf.setDrawColor(...c);
@@ -422,7 +423,7 @@ function generateMedicalPDF(mother, report, prevReport, allReports) {
   }
 
   // ── RECOMMENDATIONS
-  
+
   b(10);
   pdf.text("DOCTOR RECOMMENDATIONS", M, y);
   y += 6;
@@ -460,10 +461,10 @@ function generateMedicalPDF(mother, report, prevReport, allReports) {
     }[report.risk] || [];
   const recHeight = recs.length * 7 + 8;
 
-if (y + recHeight > PAGE_HEIGHT - 40) {
-  pdf.addPage();
-  y = 20;
-}
+  if (y + recHeight > PAGE_HEIGHT - 40) {
+    pdf.addPage();
+    y = 20;
+  }
 
   pdf.setFillColor(245, 245, 245);
   pdf.setDrawColor(180, 180, 180);
@@ -478,34 +479,34 @@ if (y + recHeight > PAGE_HEIGHT - 40) {
   y += recs.length * 7 + 14;
 
   // ── FOOTER
-// ✅ Dynamic footer placement
-if (y > PAGE_HEIGHT - 30) {
-  pdf.addPage();
-  y = 20;
-}
+  // ✅ Dynamic footer placement
+  if (y > PAGE_HEIGHT - 30) {
+    pdf.addPage();
+    y = 20;
+  }
 
-ln(M, y + 5, W - M, y + 5);
+  ln(M, y + 5, W - M, y + 5);
 
-n(7.5);
-clr(130, 130, 130);
-pdf.text(
-  "This report is AI-generated and intended to assist healthcare professionals only.",
-  M,
-  y + 10
-);
-pdf.text(
-  "It does not replace clinical diagnosis. Always consult a qualified physician.",
-  M,
-  y + 15
-);
+  n(7.5);
+  clr(130, 130, 130);
+  pdf.text(
+    "This report is AI-generated and intended to assist healthcare professionals only.",
+    M,
+    y + 10,
+  );
+  pdf.text(
+    "It does not replace clinical diagnosis. Always consult a qualified physician.",
+    M,
+    y + 15,
+  );
 
-b(8);
-clr(50, 50, 50);
-pdf.text("ArovyaCare Maternal Health AI", W - M, y + 10, { align: "right" });
+  b(8);
+  clr(50, 50, 50);
+  pdf.text("ArovyaCare Maternal Health AI", W - M, y + 10, { align: "right" });
 
-n(7.5);
-clr(130, 130, 130);
-pdf.text("Confidential Patient Record", W - M, y + 15, { align: "right" });
+  n(7.5);
+  clr(130, 130, 130);
+  pdf.text("Confidential Patient Record", W - M, y + 15, { align: "right" });
   pdf.save(
     `ArovyaCare_${mother?.name || "Patient"}_${fmt(report.createdAt)}.pdf`,
   );
@@ -563,7 +564,8 @@ async function saveReportSnapshot(report, mother, allReports) {
 // COMPONENTS
 // ─────────────────────────────────────────────
 function PatientHeader({ mother, report }) {
-  const rc = riskConfig[report?.risk] || riskConfig.Healthy;
+  const navigate = useNavigate();
+  const rc = riskConfig[report?.risk] || riskConfig.Low;
   return (
     <div className="rounded-3xl bg-gradient-to-r from-pink-500 via-pink-400 to-pink-600 p-8 text-white overflow-hidden relative shadow-2xl shadow-pink-200">
       <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
@@ -858,8 +860,12 @@ function AISummary({ report, prevReport, alerts }) {
 // ─────────────────────────────────────────────
 export default function ReportPage() {
   const { id } = useParams();
+  const location = useLocation();
+  const patientId = location.state?.patientId;
+  const navigate = useNavigate();
   const [report, setReport] = useState(null);
   const [mother, setMother] = useState(null);
+
   const [allReports, setAllReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
@@ -985,172 +991,199 @@ export default function ReportPage() {
 
   return (
     <div className="min-h-full bg-[#faf8ff] px-4 py-6 md:px-8">
-      <div className="flex justify-end mb-4">
+      <button
+        onClick={() =>
+          navigate(patientId ? `/patient/${patientId}` : "/dashboard")
+        }
+        className="mb-4 text-sm text-gray-500 hover:text-pink-600 flex items-center gap-1"
+      >
+        <ArrowLeft size={14} /> Back
+      </button>
+
+      {/* 🔥 Top Right Buttons */}
+      <div className="flex justify-end gap-3 mb-4">
+        {/* 🏥 Nearby Hospitals */}
         <button
-          onClick={() => {
-            setDownloading(true);
-            generateMedicalPDF(mother, report, prevReport, allReports);
-            setDownloading(false);
-          }}
-          disabled={downloading}
-          className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm shadow-lg transition-all duration-200 ${downloading ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:scale-105 active:scale-95"}`}
+          onClick={() => navigate("/emergency-map")}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm shadow-lg bg-red-500 text-white hover:scale-105 active:scale-95 transition-all duration-200"
         >
-          {downloading ? (
-            <>
-              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
-              Generating...
-            </>
-          ) : (
-            <>
-              <Download size={16} />
-              Download Medical Report
-            </>
-          )}
+          🏥 Nearby Hospitals
         </button>
-      </div>
 
-      <div className="space-y-6">
-        <PatientHeader mother={mother} report={report} />
+          <button
+            onClick={() => {
+              setDownloading(true);
+              generateMedicalPDF(mother, report, prevReport, allReports);
+              setDownloading(false);
+            }}
+            disabled={downloading}
+            className={`
+            flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm
+            shadow-lg transition-all duration-200
+            ${
+              downloading
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : " bg-blue-500 text-white hover:shadow-pink-200 hover:scale-105 active:scale-95"
+            }
+          `}
+          >
+            {downloading ? (
+              <>
+                <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+                Generating PDF...
+              </>
+            ) : (
+              <>
+                <Download size={16} />
+                Download Report PDF
+              </>
+            )}
+          </button>
+        </div>
+        {/* ✅ WRAP ALL REPORT CONTENT WITH THIS REF DIV */}
+        <div  className="space-y-6 bg-[#faf8ff] p-2">
+          {/* A — PATIENT HEADER */}
+          <PatientHeader mother={mother} report={report} />
 
-        {alerts.length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-              ⚠ Critical Alerts
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {alerts.map((a, i) => (
-                <AlertCard key={i} {...a} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        <TrendStatement trendResult={trendResult} />
-        {prevReport && (
-          <RiskEvolution prevRisk={prevReport.risk} currRisk={report.risk} />
-        )}
-        <AISummary report={report} prevReport={prevReport} alerts={alerts} />
-
-        <section>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-            Current Vitals
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <VitalCard
-              label="Systolic"
-              value={toNum(vitals.systolic)}
-              unit="mmHg"
-              icon={Activity}
-              color="bg-pink-500"
-              normal="90–140"
-            />
-            <VitalCard
-              label="Diastolic"
-              value={toNum(vitals.diastolic)}
-              unit="mmHg"
-              icon={Heart}
-              color="bg-purple-500"
-              normal="60–90"
-            />
-            <VitalCard
-              label="Sugar"
-              value={toNum(vitals.sugar)}
-              unit="mg/dL"
-              icon={Droplets}
-              color="bg-amber-500"
-              normal="70–160"
-            />
-            <VitalCard
-              label="Temperature"
-              value={toNum(vitals.temp)}
-              unit="°F"
-              icon={Thermometer}
-              color="bg-orange-500"
-              normal="96–100.4"
-            />
-            <VitalCard
-              label="Heart Rate"
-              value={toNum(vitals.heartrate)}
-              unit="bpm"
-              icon={Activity}
-              color="bg-teal-500"
-              normal="60–100"
-            />
-          </div>
-        </section>
-
-        {prevReport && (
-          <section>
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-              Compared to Last Visit
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <ComparisonCard
-                label="Systolic"
-                icon={Activity}
-                current={vitals.systolic}
-                previous={prevVitals.systolic}
-                unit="mmHg"
-                lowerIsBetter
-              />
-              <ComparisonCard
-                label="Diastolic"
-                icon={Heart}
-                current={vitals.diastolic}
-                previous={prevVitals.diastolic}
-                unit="mmHg"
-                lowerIsBetter
-              />
-              <ComparisonCard
-                label="Sugar"
-                icon={Droplets}
-                current={vitals.sugar}
-                previous={prevVitals.sugar}
-                unit="mg/dL"
-                lowerIsBetter
-              />
-              <ComparisonCard
-                label="Heart Rate"
-                icon={Activity}
-                current={vitals.heartrate}
-                previous={prevVitals.heartrate}
-                unit="bpm"
-              />
-            </div>
-          </section>
-        )}
-
-        {report.answers && Object.keys(report.answers).length > 0 && (
-          <section>
-            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-              Reported Symptoms
-            </h2>
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-              <div className="flex flex-wrap gap-2">
-                {Object.entries(report.answers).map(([k, v]) => (
-                  <span
-                    key={k}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${v ? "bg-red-50 border-red-200 text-red-600" : "bg-gray-50 border-gray-200 text-gray-400"}`}
-                  >
-                    {v ? "✓" : "✗"} {k.replace(/_/g, " ")}
-                  </span>
+          {alerts.length > 0 && (
+            <section>
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                ⚠ Critical Alerts
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {alerts.map((a, i) => (
+                  <AlertCard key={i} {...a} />
                 ))}
               </div>
+            </section>
+          )}
+
+          <TrendStatement trendResult={trendResult} />
+          {prevReport && (
+            <RiskEvolution prevRisk={prevReport.risk} currRisk={report.risk} />
+          )}
+          <AISummary report={report} prevReport={prevReport} alerts={alerts} />
+
+          <section>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+              Current Vitals
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <VitalCard
+                label="Systolic"
+                value={toNum(vitals.systolic)}
+                unit="mmHg"
+                icon={Activity}
+                color="bg-pink-500"
+                normal="90–140"
+              />
+              <VitalCard
+                label="Diastolic"
+                value={toNum(vitals.diastolic)}
+                unit="mmHg"
+                icon={Heart}
+                color="bg-purple-500"
+                normal="60–90"
+              />
+              <VitalCard
+                label="Sugar"
+                value={toNum(vitals.sugar)}
+                unit="mg/dL"
+                icon={Droplets}
+                color="bg-amber-500"
+                normal="70–160"
+              />
+              <VitalCard
+                label="Temperature"
+                value={toNum(vitals.temp)}
+                unit="°F"
+                icon={Thermometer}
+                color="bg-orange-500"
+                normal="96–100.4"
+              />
+              <VitalCard
+                label="Heart Rate"
+                value={toNum(vitals.heartrate)}
+                unit="bpm"
+                icon={Activity}
+                color="bg-teal-500"
+                normal="60–100"
+              />
             </div>
           </section>
-        )}
 
-        <section>
-          <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
-            Medical Insights
-          </h2>
-          <MedicalInsightsEngine
-            vitals={report.vitals}
-            answers={report.answers}
-            risk={report.risk}
-          />
-        </section>
+          {prevReport && (
+            <section>
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                Compared to Last Visit
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <ComparisonCard
+                  label="Systolic"
+                  icon={Activity}
+                  current={vitals.systolic}
+                  previous={prevVitals.systolic}
+                  unit="mmHg"
+                  lowerIsBetter
+                />
+                <ComparisonCard
+                  label="Diastolic"
+                  icon={Heart}
+                  current={vitals.diastolic}
+                  previous={prevVitals.diastolic}
+                  unit="mmHg"
+                  lowerIsBetter
+                />
+                <ComparisonCard
+                  label="Sugar"
+                  icon={Droplets}
+                  current={vitals.sugar}
+                  previous={prevVitals.sugar}
+                  unit="mg/dL"
+                  lowerIsBetter
+                />
+                <ComparisonCard
+                  label="Heart Rate"
+                  icon={Activity}
+                  current={vitals.heartrate}
+                  previous={prevVitals.heartrate}
+                  unit="bpm"
+                />
+              </div>
+            </section>
+          )}
+
+          {report.answers && Object.keys(report.answers).length > 0 && (
+            <section>
+              <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+                Reported Symptoms
+              </h2>
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(report.answers).map(([k, v]) => (
+                    <span
+                      key={k}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold border ${v ? "bg-red-50 border-red-200 text-red-600" : "bg-gray-50 border-gray-200 text-gray-400"}`}
+                    >
+                      {v ? "✓" : "✗"} {k.replace(/_/g, " ")}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          <section>
+            <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
+              Medical Insights
+            </h2>
+            <MedicalInsightsEngine
+              vitals={report.vitals}
+              answers={report.answers}
+              risk={report.risk}
+            />
+          </section>
+        </div>
       </div>
-    </div>
   );
 }
