@@ -5,9 +5,11 @@ import {
   Activity,
   HeartPulse,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ResultPage({ risk = "Medium", data }) {
 
+  const navigate = useNavigate();
   const riskConfig = {
     High: {
       color: "text-red-600",
@@ -32,7 +34,13 @@ export default function ResultPage({ risk = "Medium", data }) {
     },
   };
 
-  const r = riskConfig[risk];
+ const normalizedRisk =
+  risk === "High" || risk === "Medium" || risk === "Low"
+    ? risk
+    : "Low";
+  
+  const finalRisk = risk || "Low";
+  const r = riskConfig[normalizedRisk];
 
   return (
     <div className="h-full w-full flex items-center justify-center bg-gradient-to-br from-pink-50 to-white px-4">
@@ -118,15 +126,27 @@ export default function ResultPage({ risk = "Medium", data }) {
         </motion.div>
 
         {/* 🚀 CTA */}
-        <div className="flex gap-4 justify-center">
-          <button className="px-6 py-3 bg-green-500 text-white rounded-xl shadow hover:scale-105 transition">
-            Book Doctor
-          </button>
+        <div className="flex gap-4 justify-center flex-wrap">
 
-          <button className="px-6 py-3 bg-gray-100 rounded-xl">
-            Download Report
-          </button>
-        </div>
+            <button className="px-6 py-3 bg-green-500 text-white rounded-xl shadow hover:scale-105 transition">
+              Book Doctor
+            </button>
+
+            <button className="px-6 py-3 bg-gray-100 rounded-xl">
+              Download Report
+            </button>
+
+            {/* 🚨 NEW BUTTON ONLY FOR HIGH RISK */}
+            {finalRisk === "High" && (
+              <button
+                onClick={() => navigate("/emergency-map")}
+                className="px-6 py-3 bg-red-500 text-white rounded-xl shadow hover:scale-105 transition animate-pulse"
+              >
+                🚨 Find Nearby Hospitals
+              </button>
+            )}
+
+          </div>
 
       </div>
     </div>

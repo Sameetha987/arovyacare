@@ -1,6 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { db } from "../firebase";
+import { ArrowLeft } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   doc,
   getDoc,
@@ -40,6 +42,9 @@ import {
 // Add these imports at the top of ReportPage.jsx
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+// add useRef + useState if not already there
+ // add Download icon
+
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -93,6 +98,7 @@ const fmt = (d) => {
 
 // 🔥 A — PATIENT HEADER
 function PatientHeader({ mother, report }) {
+  const navigate = useNavigate(); 
   const rc = riskConfig[report?.risk] || riskConfig.Low;
   return (
     <div
@@ -103,7 +109,7 @@ function PatientHeader({ mother, report }) {
         <div className="absolute -top-10 -right-10 w-48 h-48 bg-white/10 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute bottom-0 left-1/3 w-32 h-32 bg-white/5 rounded-full blur-xl pointer-events-none" />
 
-        <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative flex justify-between items-start gap-6">
           {/* LEFT */}
           <div className="flex items-center gap-5">
             <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-3xl font-bold shadow-lg">
@@ -136,27 +142,28 @@ function PatientHeader({ mother, report }) {
           </div>
 
           {/* RIGHT */}
-          <div className="flex flex-col items-end gap-2">
-            <div
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border bg-white/15 backdrop-blur border-white/30 text-white font-bold text-lg shadow-lg`}
-            >
-              <span
-                className={`w-3 h-3 rounded-full ${rc.dot} animate-pulse`}
-              />
-              {report?.risk || "—"} Risk
-            </div>
-            <p className="text-white/60 text-xs">
-              <Calendar size={11} className="inline mr-1" />
-              Report: {fmt(report?.createdAt)}
-            </p>
-            <p className="text-white/60 text-xs">
-              {mother?.weight && `${mother.weight} kg`}
-              {mother?.height && ` · ${mother.height} cm`}
-            </p>
-          </div>
-        </div>
-      </div>
+                   <div className="flex flex-col items-end gap-1">
+
+  {/* TOP ROW */}
+  <div className="flex items-center gap-5">
+
+    {/* Risk */}
+    <div className="flex items-center gap-2 text-white font-medium text-sm">
+      <span className={`w-2.5 h-2.5 rounded-full ${rc.dot}`} />
+      {report?.risk} Risk
     </div>
+
+  </div>
+              {/* BOTTOM ROW */}
+              <p className="text-white/60 text-xs mt-1">
+                <Calendar size={11} className="inline mr-1" />
+                Report: {fmt(report?.createdAt)}
+              </p>
+
+            </div>
+                    </div>
+                  </div>
+                </div>
   );
 }
 
@@ -513,9 +520,12 @@ function AISummary({ report, prevReport, alerts }) {
 // ─────────────────────────────────────────────
 export default function ReportPage() {
   const { id } = useParams();
-
+  const location = useLocation();
+  const patientId = location.state?.patientId;
+  const navigate = useNavigate();
   const [report, setReport] = useState(null);
   const [mother, setMother] = useState(null);
+
   const [allReports, setAllReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const reportRef = useRef(null); // ✅ ADD THIS
@@ -716,36 +726,56 @@ export default function ReportPage() {
     }
   };
 
-  return (
-    <div className="min-h-full bg-[#faf8ff] px-4 py-6 md:px-8">
-      {/* ✅ DOWNLOAD BUTTON — sticky top right */}
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={downloadPDF}
-          disabled={downloading}
-          className={`
-            flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm
-            shadow-lg transition-all duration-200
-            ${
-              downloading
-                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                : " bg-blue-500 text-white hover:shadow-pink-200 hover:scale-105 active:scale-95"
-            }
-          `}
-        >
-          {downloading ? (
-            <>
-              <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
-              Generating PDF...
-            </>
-          ) : (
-            <>
-              <Download size={16} />
-              Download Report PDF
-            </>
-          )}
-        </button>
-      </div>
+const downloadContent = downloading ? (
+  <>
+    <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-500 rounded-full animate-spin" />
+    Generating PDF...
+  </>
+) : (
+  <>
+    <Download size={16} />
+    Download Report PDF
+  </>
+);
+
+return (
+  <div className="min-h-full bg-[#faf8ff] px-4 py-6 md:px-8">
+    <button
+        onClick={() =>
+          navigate(patientId ? `/patient/${patientId}` : "/dashboard")
+        }
+        className="mb-4 text-sm text-gray-500 hover:text-pink-600 flex items-center gap-1"
+      >
+        <ArrowLeft size={14} /> Back
+      </button>
+
+    {/* 🔥 TOP RIGHT BUTTONS */}
+    <div className="flex justify-end gap-3 mb-4">
+
+      {/* 🏥 Nearby Hospitals */}
+      <button
+        onClick={() => navigate("/emergency-map")}
+        className="flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm shadow-lg bg-red-500 text-white hover:scale-105 active:scale-95 transition-all duration-200"
+      >
+        🏥 Nearby Hospitals
+      </button>
+
+      {/* ⬇ Download Report */}
+      <button
+        onClick={downloadPDF}
+        disabled={downloading}
+        className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-semibold text-sm shadow-lg transition-all duration-200 ${
+          downloading
+            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+            : "bg-blue-500 text-white hover:scale-105 active:scale-95"
+        }`}
+      >
+        {downloadContent}
+      </button>
+
+    </div>
+
+
       {/* ✅ WRAP ALL REPORT CONTENT WITH THIS REF DIV */}
       <div ref={reportRef} className="space-y-6 bg-[#faf8ff] p-2">
         {/* A — PATIENT HEADER */}
@@ -775,7 +805,6 @@ export default function ReportPage() {
 
         {/* H — AI SUMMARY */}
         <AISummary report={report} prevReport={prevReport} alerts={alerts} />
-
         {/* F — VITAL CARDS */}
         <section>
           <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">
