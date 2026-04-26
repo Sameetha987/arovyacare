@@ -226,15 +226,7 @@ export default function EmergencyMap() {
             <h1 className="text-base font-bold text-gray-900 leading-tight">Emergency Hospital Finder</h1>
             <p className="text-[11px] text-gray-400">Real-time · OpenStreetMap</p>
           </div>
-          <a
-            href="tel:108"
-            className="flex-shrink-0 flex items-center gap-1.5 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white text-sm font-semibold px-3 py-1.5 rounded-lg transition-colors"
-          >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" />
-            </svg>
-            108
-          </a>
+        
         </div>
 
         {/* Search row */}
