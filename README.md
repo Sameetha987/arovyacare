@@ -118,13 +118,8 @@ npm start
 ## 👩‍💻 Team
 
 **Sameetha & Saveetha**
-Built ArovyaCare to enable early maternal risk detection using AI for underserved communities.
 
----
-
-## 📜 License
-
-This project is open-source and available under the [MIT License](LICENSE).
+- Built ArovyaCare to enable early maternal risk detection using AI for underserved communities.
 
 ---
 
