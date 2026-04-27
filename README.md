@@ -44,7 +44,7 @@ Deployment
 ▲ Vercel
 🚀 Live Demo
 
-👉 https://arovyacare.vercel.app/patient/PVA2cATj8hw7U6oF43ev
+👉 https://arovyacare.vercel.app
 
 📂 GitHub Repository
 
@@ -65,27 +65,47 @@ npm start
 
 # Build for production
 npm run build
+
 🧠 How It Works
+
 ASHA worker enters patient details
+
 System collects vitals and symptoms
+
 AI model analyzes risk factors
+
 Generates:
+
 Risk level (Low / Medium / High)
+
 Health insights
+
 Recommendations
+
 High-risk cases are flagged for immediate action
+
 🎯 Impact
+
 ⏱️ Enables early detection of maternal risks
+
 🏥 Reduces delays in treatment
+
 💰 Lowers healthcare costs
+
 👩‍⚕️ Supports frontline health workers
+
 🌍 Scalable for rural healthcare systems
+
 🔮 Future Enhancements
+
 📲 Mobile application version
+
 🌐 Multi-language support (Tamil + regional languages)
+
 🧠 Improved ML models for higher accuracy
-🛰️ Offline mode for low connectivity areas
+
 🔗 Integration with government healthcare systems
+
 👩‍💻 Team
 
 Sameetha & Saveetha
