@@ -1,70 +1,104 @@
-# Getting Started with Create React App
+🌸 ArovyaCare – AI-Powered Maternal Health Risk Detection System
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+ArovyaCare is an intelligent healthcare platform designed to support early detection of pregnancy-related risks, especially in rural and underserved communities.
 
-## Available Scripts
+It empowers ASHA workers with AI-driven insights, helping them monitor patients effectively, identify high-risk cases early, and ensure timely medical intervention.
 
-In the project directory, you can run:
+🚨 Problem Statement
 
-### `npm start`
+In many rural areas:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Pregnant women lack access to timely healthcare
+Early symptoms often go unnoticed or ignored
+Hospitals are located far away (50–100 km)
+ASHA workers manage multiple patients with limited tools
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+These challenges lead to delayed diagnosis and increased risk of complications for both mother and child.
 
-### `npm test`
+💡 Our Solution
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+ArovyaCare provides a simple and effective digital solution:
 
-### `npm run build`
+📱 Easy patient data entry for ASHA workers
+🤖 AI-based risk prediction using vitals and symptoms
+📊 Real-time reports and health insights
+🚨 Early alerts for high-risk cases
+🌐 Web-based platform accessible anywhere
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+👉 Goal: Early Detection → Timely Action → Better Outcomes
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+✨ Key Features
+🧠 AI-powered maternal risk assessment
+📋 Simple and user-friendly data input
+📊 Automated report generation
+🚨 Early warning alerts
+🌍 Designed for low-resource environments
+📱 Responsive and clean UI
+🛠️ Tech Stack
+Frontend
+⚛️ React (Create React App)
+🎨 CSS
+Backend / Database
+🔥 Firebase (Firestore + Authentication)
+Deployment
+▲ Vercel
+🚀 Live Demo
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+👉 https://arovyacare.vercel.app/patient/PVA2cATj8hw7U6oF43ev
 
-### `npm run eject`
+📂 GitHub Repository
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+👉 https://github.com/Sameetha987/arovyacare
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+⚙️ Installation & Setup
+# Clone the repository
+git clone https://github.com/Sameetha987/arovyacare.git
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+# Navigate to project folder
+cd arovyacare
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+# Install dependencies
+npm install
 
-## Learn More
+# Run the project
+npm start
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Build for production
+npm run build
+🧠 How It Works
+ASHA worker enters patient details
+System collects vitals and symptoms
+AI model analyzes risk factors
+Generates:
+Risk level (Low / Medium / High)
+Health insights
+Recommendations
+High-risk cases are flagged for immediate action
+🎯 Impact
+⏱️ Enables early detection of maternal risks
+🏥 Reduces delays in treatment
+💰 Lowers healthcare costs
+👩‍⚕️ Supports frontline health workers
+🌍 Scalable for rural healthcare systems
+🔮 Future Enhancements
+📲 Mobile application version
+🌐 Multi-language support (Tamil + regional languages)
+🧠 Improved ML models for higher accuracy
+🛰️ Offline mode for low connectivity areas
+🔗 Integration with government healthcare systems
+👩‍💻 Team
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Sameetha & Saveetha
+Built ArovyaCare to enable early maternal risk detection using AI for underserved communities.
 
-### Code Splitting
+📜 License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+This project is open-source and available under the MIT License.
 
-### Analyzing the Bundle Size
+⭐ Support
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+If you found this project useful:
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+⭐ Star the repository
+🍴 Fork the project
+🤝 Contribute and improve
